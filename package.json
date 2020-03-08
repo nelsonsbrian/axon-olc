@@ -1,0 +1,17 @@
+{
+  "name": "axon-olc",
+  "version": "1.0.0",
+  "description": "Ranvier Bundle OLC (Online Creation) JSON/YAML Definition Editor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nelsonsbrian/axon-olc.git"
+  },
+  "author": "Brian Nelson <nelsonsbrian@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "rando-js": "github:seanohue/rando#master"
+  },
+  "bugs": {
+    "url": "https://github.com/nelsonsbrian/axon-olc/issues"
+  }
+}
