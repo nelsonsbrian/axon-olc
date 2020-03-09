@@ -9,7 +9,11 @@
   "author": "Brian Nelson <nelsonsbrian@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "rando-js": "github:seanohue/rando#master"
+    "@hapi/joi": "^17.1.0",
+    "indefinite-article": "0.0.2",
+    "pluralize": "^8.0.0",
+    "rando-js": "github:seanohue/rando#master",
+    "sprintf-js": "^1.1.2"
   },
   "bugs": {
     "url": "https://github.com/nelsonsbrian/axon-olc/issues"
