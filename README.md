@@ -6,7 +6,9 @@ This is a work in progress and many of the details will be fleshed out in the fu
 
 This bundle will be opened up for PRs soon.
 
+---
 ## Install Axon-OLC
+
 
 ### SubModule
 From the `Ranvier` root directory:
@@ -23,7 +25,7 @@ Additional Resources: https://ranviermud.com/bundles/
 
 ### Add Code
 Inside of the `input-events/commands/` add the following code for OLC operation.
-```     
+```javascript    
  function loop () {
     // OLC command bypass
     if (player.otherInput) {
@@ -34,12 +36,19 @@ Inside of the `input-events/commands/` add the following code for OLC operation.
 }
 ```
 
+---
 ## Known Issues
-*Does not save and will most likely crash in if exiting the editor and selecting `yes` to save.
+* Only the `Room` entity has code written for it.
+* The bundle does not currently leverage the `entityLoader` feature of `Ranvier`.
 
-
+---
 ## Common OLC Commands
+---
+
 `rlist [areaName]` - lists all the rooms in the specified area. No-arg defaults to current area of player.
 
 `redit <roomEntityReference | .>` - Opens the editor for the room. No-arg and . defaults to current room. `roomEntityReference` has  partial lookup. For example, a room with entityReference of `magicForest:1` can be accessed by typing `redit mag:1` as long as there are no other area's with that name higher in the alphabetical order.
+`redit save <areaName | .` - Saves the edited definitions of the specific area to disk.
+
+`olc` - Shows a list of areas that have changes made it it, but not saved to disk. Use `redit save`.
 

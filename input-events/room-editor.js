@@ -6,6 +6,7 @@ const Joi = require('@hapi/joi');
 const { Broadcast: B, EventUtil, } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
 const { capitalize: cap, objClass } = require('../lib/StringUtil');
+const { toDirections } = require('../lib/Constants');
 
 module.exports = () => {
 
@@ -71,6 +72,51 @@ module.exports = () => {
         }
       });
 
+      // All Exits
+      [...Object.keys(toDirections)].forEach((direction, i) => {
+        const exit = def.exits.find(ex => ex.direction === direction);
+        const exitRoom = exit && state.RoomManager.getRoom(exit.roomId);
+        options.push({
+          display: cap(direction),
+          displayValues: (exit && `${exit.roomId} - ${exitRoom.title}`) || none,
+          key: String.fromCharCode(65 + i), // 65=A
+          onSelect: () => {
+            inputConfig.menuMap.set('room-exit', {
+              direction,
+            });
+            eventStack.push(fileName);
+            player.socket.emit('room-exit', player, inputConfig);
+          }
+        });
+      });
+
+      const items = def.items || [];
+      options.push({
+        display: 'Default Items',
+        displayValues: items.length || none,
+        key: 'N',
+        onSelect: (choice) => {
+          menuMap.set('list-text', {
+            current: [...items],
+            displayProperty: choice.display,
+            getCurrent: (er) => state.ItemFactory.getDefinition(er),
+            currentDisplay: (foundDef) => foundDef ? foundDef.name : '',
+            columns: 1,
+            showChoice: false,
+            schema: Joi.string().empty(''),
+            params: {
+              type: 'entityReference',
+              entityType: 'item',
+            },
+            onExit: choice.onExit,
+          });
+          eventStack.push(fileName);
+          player.socket.emit('list-text', player, inputConfig);
+        },
+        onExit: (optionConfig) => {
+          def.items = [...optionConfig.current];
+        }
+      });
 
       const npcs = def.npcs || [];
       options.push({

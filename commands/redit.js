@@ -3,6 +3,7 @@
 const { Broadcast: B, PlayerRoles } = require('ranvier');
 const SU = require('../lib/StringUtil');
 const DU = require('../lib/DisplayUtil');
+const EU = require('../lib/EntityUtil');
 
 module.exports = () => {
 
@@ -60,7 +61,6 @@ module.exports = () => {
 
       // Alreadying Editing
       if (saving) {
-        return;
         const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area);
         if (alreadyEditing) {
           return B.sayAt(player, `Can't save '<b><yellow>${area.name}'</yellow></b> as it is currently being edited.`);
@@ -76,13 +76,13 @@ module.exports = () => {
 
         function save() {
           DU.leaveOLC(state, player);
-          targetRoom.reloadFromDefinition(targetRoom.defEdit, state);
-          area.unsavedChanges(objClass(targetRoom));
+          EU.reloadFromRoomDefinition(targetRoom, targetRoom.defEdit);
+          area.changesMade ? area.changesMade.room = true : area.changesMade = { room: true };
         }
 
         targetRoom.defEdit = JSON.parse(JSON.stringify(targetRoom.def));
 
-        return DU.enterOLC(state, player, { entity: targetRoom, area, save, editor: 'room-editor' }, newRoom);
+        DU.enterOLC(state, player, { entity: targetRoom, area, save, editor: 'room-editor' }, newRoom);
       }
 
     }
