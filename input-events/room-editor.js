@@ -23,7 +23,7 @@ module.exports = () => {
       }, inputConfig);
       inputConfig.fileName = fileName;
 
-      let { entity, eventStack, menuMap, def, none } = inputConfig;
+      let { eventStack, menuMap, def, none } = inputConfig;
 
       let options = [];
 
