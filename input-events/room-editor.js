@@ -9,7 +9,6 @@ const { capitalize: cap, objClass } = require('../lib/StringUtil');
 const { toDirections } = require('../lib/Constants');
 
 module.exports = () => {
-
   return {
     event: state => (player, inputConfig) => {
       const socket = player.socket;
@@ -22,7 +21,6 @@ module.exports = () => {
         eventStack: [],
         none: `<red>None</red>`,
       }, inputConfig);
-      inputConfig.def = inputConfig.entity.defEdit;
       inputConfig.fileName = fileName;
 
       let { entity, eventStack, menuMap, def, none } = inputConfig;

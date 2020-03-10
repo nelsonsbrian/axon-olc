@@ -1,6 +1,6 @@
 'use strict';
 
-const { Broadcast: B, PlayerRoles, Room } = require('ranvier');
+const { Broadcast: B, PlayerRoles } = require('ranvier');
 const SU = require('../lib/StringUtil');
 const DU = require('../lib/DisplayUtil');
 const EU = require('../lib/EntityUtil');
@@ -9,16 +9,16 @@ module.exports = () => {
 
   return {
     requiredRole: PlayerRoles.BUILDER,
-    usage: 'redit <ER> || save <area>',
+    usage: 'oedit <ER> || save <area>',
     command: (state) => (args, player, arg0) => {
 
       let targetDef = null;
       let saving = false;
       let area;
       let created = false;
-      const type = 'Room';
+      const type = 'Item';
       if (!args) {
-        targetDef = player.room.def;
+        targetDef = player.room;
         area = player.room.area;
       } else {
 
@@ -34,27 +34,25 @@ module.exports = () => {
 
         if (tarER === '.') {
           area = player.room.area;
-          targetDef = player.room.def;
+          targetDef = player.room;
         }
 
         if (!area) {
-
-          const { target, area: resultArea, idNum } = SU.findER(state, player, 'room', tarER);
+          const { target, area: resultArea, idNum } = SU.findER(state, player, 'item', tarER);
           area = resultArea;
-          targetDef = target && target.def;
+          targetDef = target;
 
           if (!area) {
             return B.sayAt(player, `Can't find the area: '${tarER}'.`);
           }
 
           if (!targetDef && !saving) {
-            targetDef = EU.createRoomDefinition(state, area, { id: idNum }, player)
+            targetDef = EU.createItemDefinition(state, area, { id: idNum }, player);
             created = true;
 
             if (!targetDef) {
-              return B.sayAt(player, `Could not create the room '${tarER}'.`);
+              return B.sayAt(player, `Could not create the item '${tarER}'.`);
             }
-            created = true;
           }
         }
       }
@@ -70,22 +68,16 @@ module.exports = () => {
 
       const er = state.ItemFactory.createEntityRef(area.name, targetDef.id);
       if (!saving) {
-        const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === targetDef);
+        const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area && pl.olc.er === er);
         if (alreadyEditing) {
           return B.sayAt(player, `The entity: ${er} is already being edited.`);
         }
 
         function save() {
-          if (created) {
-            const newRoom = new Room(area, createdConfig);
-            area.addRoom(newRoom);
-            state.RoomManager.addRoom(newRoom);
-            newRoom.hydrate(state);
-          } else {
-            EU.reloadFromRoomDefinition(state.RoomManager.getRoom(er), targetDef);
-          }
           DU.leaveOLC(state, player);
-          area.changesMade ? area.changesMade.room = true : area.changesMade = { room: true };
+          state.ItemFactory.setDefinition(er, targetDef);
+          area.addDefaultItem(er);
+          area.changesMade ? area.changesMade.item = true : area.changesMade = { item: true };
         }
 
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
@@ -96,9 +88,9 @@ module.exports = () => {
             type,
             area,
             save,
-            editor: 'room-editor',
+            editor: 'item-editor',
             created,
-            loggerName: targetDef.name || targetDef.title || `a new room`,
+            loggerName: targetDef.name || targetDef.title || `a new item`,
           }
         );
       }
