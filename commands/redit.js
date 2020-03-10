@@ -48,8 +48,7 @@ module.exports = () => {
           }
           if (!targetRoom && !saving) {
 
-            // const newRoomDef = area.createRoomDefinition(state, { id: idNum }, player);
-            // targetRoom = area.createRoom(state, newRoomDef);
+            targetRoom = EU.createRoom(state, area, { id: idNum }, player)
 
             if (!targetRoom) {
               return B.sayAt(player, `Could not create the room '${tarER}'.`);
