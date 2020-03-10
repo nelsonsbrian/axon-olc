@@ -351,6 +351,38 @@ module.exports = () => {
         }
       });
 
+
+      // TODO: The bundlemanger ends up naming the scripts as entity referencess,
+      // Example, script of 'ranvier-blade' is named 'limbo:bladeofranvier' in the behaviorManager.
+      // So will need to figure this out to be able to assign scripts, unless we free form text it.
+      // const scriptSelections = [...state.ItemFactory.scripts.behaviors.keys()].map(script => {
+      //   return {
+      //     display: cap(script),
+      //     script,
+      //   }
+      // });
+      // const script = def.script || '';
+      // options.push({
+      //   display: 'Script',
+      //   displayValues: script || none,
+      //   key: 'S',
+      //   onSelect: (choice) => {
+      //     menuMap.set('select-one', {
+      //       text: script,
+      //       selections: scriptSelections,
+      //       columns: 3,
+      //       minWidth: 10,
+      //       displayProperty: choice.display,
+      //       onExit: choice.onExit,
+      //     });
+      //     eventStack.push(fileName);
+      //     player.socket.emit('select-one', player, inputConfig);
+      //   },
+      //   onExit: (optionConfig) => {
+      //     def.script = optionConfig.selection.script;
+      //   }
+      // });
+
       // options.push({
       //   display: 'Stats',
       //   displayValues: '',
