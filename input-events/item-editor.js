@@ -9,7 +9,6 @@ const { capitalize: cap } = require('../lib/StringUtil');
 const { itemSlots } = require('../lib/Constants');
 
 module.exports = () => {
-
   return {
     event: state => (player, inputConfig) => {
       const socket = player.socket;
@@ -150,11 +149,26 @@ module.exports = () => {
           player.socket.emit('select-one', player, inputConfig);
         },
         onExit: (optionConfig) => {
-          console.log(optionConfig.selection)
           def.type = optionConfig.selection.type;
+
+          // Set defaults to other properties based on the ItemType selected.
+          if (ItemType[def.type] === ItemType.ARMOR) {
+            def.metadata.slot = 'head';
+            def.metadata.stats = {};
+          }
+          if (ItemType[def.type] === ItemType.WEAPON) {
+            def.metadata.slot = 'wield';
+            def.metadata.maxDamage = 10.0;
+            def.metadata.minDamage = 5.0;
+            def.metadata.speed = 2.0;
+            def.metadata.stats = {};
+          }
+          if (ItemType[def.type] === ItemType.CONTAINER) {
+            def.metadata.maxItems = 1;
+            def.items = [];
+          }
         }
       });
-
 
       const level = def.metadata.level || 1;
       options.push({
@@ -196,6 +210,45 @@ module.exports = () => {
         }
       });
 
+
+      const qualitySelections = Object.keys(ItemType).map(quality => {
+        return {
+          display: `${cap(quality)}`,
+          quality,
+        }
+      });
+      const quality = def.metadata.quality || 'common';
+      options.push({
+        display: `Quality`,
+        displayValues: quality,
+        key: 'E',
+        onSelect: (choice) => {
+          menuMap.set('select-one', {
+            text: quality,
+            selections: qualitySelections,
+            columns: 1,
+            displayProperty: `Item Quality`,
+            required: true,
+            onExit: choice.onExit,
+          });
+          eventStack.push(fileName);
+          player.socket.emit('select-one', player, inputConfig);
+        },
+        onExit: (optionConfig) => {
+          def.metadata.quality = optionConfig.selection.quality;
+        }
+      });
+
+      const noPickup = def.metadata.noPickup || false;
+      options.push({
+        display: cap(noPickup),
+        displayValues: `${o}${noPickup.toString()}${c}`,
+        key: 'F',
+        onSelect: () => {
+          def.metadata.noPickup = !def.metadata.noPickup;
+          return socket.emit(fileName, player, inputConfig);
+        }
+      });
 
       const slotSelections = itemSlots.map(slot => {
         return {
@@ -260,40 +313,37 @@ module.exports = () => {
         },
         hide: () => {
           if (ItemType[def.type] !== ItemType.CONTAINER) {
-            def.items = [];
+            delete def.items;
             return true;
           }
         },
       });
 
-      // const speed = def.metadata.speed || 1;
-      // const { min: speedMin, max: speedMax } = convertSpeed(attackType);
-      // options.push({
-      //   display: 'Speed',
-      //   displayValues: speed,
-      //   key: 'L',
-      //   onSelect: (choice) => {
-      //     if (!def.override) {
-      //       say(`<red>Item property 'Override' needs to be true to set this property.</red>`);
-      //       return socket.emit(fileName, player, inputConfig);
-      //     }
-      //     menuMap.set('input-text', {
-      //       text: speed,
-      //       schema: Joi.number().precision(2).min(speedMin).max(speedMax).required(),
-      //       displayProperty: choice.display,
-      //       onExit: choice.onExit,
-      //     });
-      //     eventStack.push(fileName);
-      //     player.socket.emit('input-text', player, inputConfig);
-      //   },
-      //   onExit: (optionConfig) => {
-      //     const inputSpeed = parseFloat(optionConfig.text);
-      //     def.metadata.speed = inputSpeed;
-      //   },
-      //   hide: () => {
-      //     return !(defType[def.type] && defType[def.type].hasOwnProperty('speed'));
-      //   },
-      // });
+      const maxItems = def.maxItems || 1;
+      options.push({
+        display: 'Max Items',
+        displayValues: maxItems,
+        key: 'M',
+        onSelect: (choice) => {
+          menuMap.set('input-text', {
+            text: maxItems,
+            schema: Joi.number().integer(1).min(1).max(100).required(),
+            displayProperty: choice.display,
+            onExit: choice.onExit,
+          });
+          eventStack.push(fileName);
+          player.socket.emit('input-text', player, inputConfig);
+        },
+        onExit: (optionConfig) => {
+          def.maxItems = parseInt(optionConfig.text);
+        },
+        hide: () => {
+          if (ItemType[def.type] !== ItemType.CONTAINER) {
+            delete def.maxItems;
+            return true;
+          }
+        }
+      });
 
       const minDamage = def.metadata.minDamage || 1;
       options.push({
@@ -301,10 +351,6 @@ module.exports = () => {
         displayValues: minDamage,
         key: 'M',
         onSelect: (choice) => {
-          if (!def.override) {
-            say(`<red>Item property 'Override' needs to be true to set this property.</red>`);
-            return socket.emit(fileName, player, inputConfig);
-          }
           menuMap.set('input-text', {
             text: minDamage,
             schema: Joi.number().precision(1).min(1).max(999).required(),
@@ -351,6 +397,34 @@ module.exports = () => {
         }
       });
 
+      const speed = def.metadata.speed || 3;
+      options.push({
+        display: 'Speed',
+        displayValues: speed,
+        key: 'O',
+        onSelect: (choice) => {
+          menuMap.set('input-text', {
+            text: speed,
+            schema: Joi.number().precision(1).min(1.0).max(4.0).required(),
+            displayProperty: choice.display,
+            onExit: choice.onExit,
+          });
+          eventStack.push(fileName);
+          player.socket.emit('input-text', player, inputConfig);
+        },
+        onExit: (optionConfig) => {
+          const inputSpeed = parseFloat(optionConfig.text);
+          def.metadata.speed = inputSpeed;
+        },
+        hide: () => {
+          if (ItemType[def.type] !== ItemType.WEAPON) {
+            delete def.metadata.speed;
+            return true;
+          }
+        }
+      });
+
+
 
       // TODO: The bundlemanger ends up naming the scripts as entity referencess,
       // Example, script of 'ranvier-blade' is named 'limbo:bladeofranvier' in the behaviorManager.
@@ -383,32 +457,23 @@ module.exports = () => {
       //   }
       // });
 
-      // options.push({
-      //   display: 'Stats',
-      //   displayValues: '',
-      //   key: 'S',
-      //   onSelect: () => {
-      //     inputConfig.menuMap.set('item-stats', {
-      //       scaled: {},
-      //     });
-      //     eventStack.push(fileName);
-      //     player.socket.emit('item-stats', player, inputConfig);
-      //   },
-      //   hide: () => {
-      //     return !(defType[def.type] && defType[def.type].hasOwnProperty('stats'));
-      //   },
-      // });
-
-      // // Get .olc function in behavior config files.
-      // if (defType[def.type]) {
-      //   [...Object.entries(defType[def.type])].filter(([key,]) => key.startsWith('behavior-')).forEach(([key, value]) => {
-      //     const behaviorName = key.split('-')[1]; // syntax 'behavior-<name>' ie 'behavior-trap'
-      //     const behaviorOlcConfig = state.ItemBehaviorManager.getOlcConfig(behaviorName);
-      //     if (behaviorOlcConfig) {
-      //       behaviorOlcConfig(player, inputConfig, options);
-      //     }
-      //   });
-      // }
+      options.push({
+        display: 'Stats',
+        displayValues: '',
+        key: 'S',
+        onSelect: () => {
+          inputConfig.menuMap.set('item-stats', {
+            // no-op
+          });
+          eventStack.push(fileName);
+          player.socket.emit('item-stats', player, inputConfig);
+        },
+        hide: () => {
+          if (ItemType[def.type] !== ItemType.ARMOR && ItemType[def.type] !== ItemType.WEAPON) {
+            delete def.metadata.stats;
+          }
+        },
+      });
 
       options.push({
         display: 'Quit',
