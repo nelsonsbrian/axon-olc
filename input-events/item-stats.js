@@ -3,12 +3,11 @@
 const sprintf = require('sprintf-js').sprintf;
 const path = require('path');
 const Joi = require('@hapi/joi');
-const { Broadcast: B, EventUtil, ItemType } = require('ranvier');
+const { Broadcast: B, EventUtil } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
 const { capitalize: cap } = require('../lib/StringUtil');
-const { itemSlots } = require('../lib/Constants');
-// const DefaultAttributes = require(bundlesPath + 'exile-lib/lib/DefaultAttributes');
-const { booleanColors } = require(bundlesPath + 'exile-lib/lib/ColorUtil');
+const { defaultAttributes } = require('../lib/Constants');
+const { back } = require('../lib/OlcOptions');
 
 module.exports = () => {
   return {
@@ -18,11 +17,10 @@ module.exports = () => {
       const write = EventUtil.genWrite(socket);
       const fileName = path.basename(__filename, '.js');
 
-      const { entity, eventStack, menuMap, area, none } = inputConfig;
-      let def = inputConfig.def;
-      const { } = menuMap.get(fileName);
-
+      let { eventStack, menuMap, def, none } = inputConfig;
       inputConfig.fileName = fileName;
+
+      const { } = menuMap.get(fileName);
 
       if (!def.metadata.stats) { def.metadata.stats = {} }
 
@@ -36,16 +34,15 @@ module.exports = () => {
       const statsArr = Object.keys(def.metadata.stats || {});
       statsArr.forEach((attr, i) => {
 
-        const statValue = def.metadata.stats[attr] || 0;
-        const scaledValue = scaled.metadata && scaled.metadata.stats[attr] || '-';
+        const statValue = def.metadata.stats[attr];
         options.push({
           display: cap(attr),
-          displayValues: sprintf(`Def Input: %-3s Scaled: %-3s`, statValue, scaledValue),
+          displayValues: statValue,
           key: (i + 1).toString(),
           onSelect: (choice) => {
             menuMap.set('input-text', {
               text: statValue + ` (-1 will delete stat)`,
-              schema: Joi.number().integer().min(-1).max(999).required(),
+              schema: Joi.number().integer().min(-1).max(9999).required(),
               displayProperty: choice.display,
               onExit: choice.onExit,
             });
@@ -62,7 +59,6 @@ module.exports = () => {
         });
       });
 
-      const attributes = DefaultAttributes.itemAtt;
       const stats = def.metadata.stats || {};
       options.push({
         display: 'Add Stats',
@@ -72,7 +68,7 @@ module.exports = () => {
         onSelect: (choice) => {
           menuMap.set('toggleable', {
             current: new Set([...Object.keys(stats)]),
-            selections: new Set([...attributes]),
+            selections: new Set([...defaultAttributes]),
             displayProperty: choice.display,
             columns: 4,
             minWidth: 5,
@@ -83,21 +79,16 @@ module.exports = () => {
         },
         onExit: (optionConfig) => {
           [...optionConfig.current].forEach(attr => {
-            def.metadata.stats[attr] = def.metadata.stats[attr] || 1;
+            def.metadata.stats[attr] = def.metadata.stats[attr] || 0;
           });
           console.log(optionConfig.current);
         }
       });
 
-      options.push(OLC.back(player, inputConfig));
+      options.push(back(player, inputConfig));
 
       // Show the Menu
       DU.showMenu(player, inputConfig, options);
-
-
-      inputConfig.menuMap.set(fileName, {
-        scaled: {},
-      });
 
     }
   };

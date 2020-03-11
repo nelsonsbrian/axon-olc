@@ -12,47 +12,46 @@ module.exports = () => {
     usage: 'oedit <ER> || save <area>',
     command: (state) => (args, player, arg0) => {
 
+      if (!args) {
+        return B.sayAt(player, 'Usage:  ' + state.CommandManager.get(arg0).usage);
+      }
+      
       let targetDef = null;
       let saving = false;
       let area;
       let created = false;
       const type = 'Item';
-      if (!args) {
-        targetDef = player.room;
+
+      let [tarER, arg2] = args.split(' ');
+      console.log(tarER, arg2);
+      if (tarER === 'save') {
+        saving = true;
+        tarER = arg2;
+        if (!tarER) {
+          return B.sayAt(player, `Which area would you like to save?`);
+        }
+      }
+
+      if (tarER === '.') {
         area = player.room.area;
-      } else {
+        targetDef = player.room;
+      }
 
-        let [tarER, arg2] = args.split(' ');
-        console.log(tarER, arg2);
-        if (tarER === 'save') {
-          saving = true;
-          tarER = arg2;
-          if (!tarER) {
-            return B.sayAt(player, `Which area would you like to save?`);
-          }
-        }
-
-        if (tarER === '.') {
-          area = player.room.area;
-          targetDef = player.room;
-        }
+      if (!area) {
+        const { target, area: resultArea, idNum } = SU.findER(state, player, 'item', tarER);
+        area = resultArea;
+        targetDef = target;
 
         if (!area) {
-          const { target, area: resultArea, idNum } = SU.findER(state, player, 'item', tarER);
-          area = resultArea;
-          targetDef = target;
+          return B.sayAt(player, `Can't find the area: '${tarER}'.`);
+        }
 
-          if (!area) {
-            return B.sayAt(player, `Can't find the area: '${tarER}'.`);
-          }
+        if (!targetDef && !saving) {
+          targetDef = EU.createItemDefinition(state, area, { id: idNum }, player);
+          created = true;
 
-          if (!targetDef && !saving) {
-            targetDef = EU.createItemDefinition(state, area, { id: idNum }, player);
-            created = true;
-
-            if (!targetDef) {
-              return B.sayAt(player, `Could not create the item '${tarER}'.`);
-            }
+          if (!targetDef) {
+            return B.sayAt(player, `Could not create the item '${tarER}'.`);
           }
         }
       }

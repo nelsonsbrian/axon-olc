@@ -6,7 +6,8 @@ const Joi = require('@hapi/joi');
 const { Broadcast: B, EventUtil, ItemType } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
 const { capitalize: cap } = require('../lib/StringUtil');
-const { itemSlots } = require('../lib/Constants');
+const { itemSlots, itemQuality } = require('../lib/Constants');
+const { booleanColors } = require('../lib/ColorUtil');
 
 module.exports = () => {
   return {
@@ -23,7 +24,7 @@ module.exports = () => {
       }, inputConfig);
       inputConfig.fileName = fileName;
 
-      let { entity, eventStack, menuMap, def, none } = inputConfig;
+      let { eventStack, menuMap, def, none } = inputConfig;
       def.metadata = def.metadata || {};
 
       let options = [];
@@ -211,7 +212,7 @@ module.exports = () => {
       });
 
 
-      const qualitySelections = Object.keys(ItemType).map(quality => {
+      const qualitySelections = itemQuality.map(quality => {
         return {
           display: `${cap(quality)}`,
           quality,
@@ -239,10 +240,11 @@ module.exports = () => {
         }
       });
 
-      const noPickup = def.metadata.noPickup || false;
+      const noPickup = (typeof def.metadata.noPickup === "boolean") ? def.metadata.noPickup : false;
+      const { open: o, close: c } = booleanColors(noPickup) || { open: '', close: '' };
       options.push({
-        display: cap(noPickup),
-        displayValues: `${o}${noPickup.toString()}${c}`,
+        display: 'NoPickup',
+        displayValues: `${o}${cap(noPickup.toString())}${c}`,
         key: 'F',
         onSelect: () => {
           def.metadata.noPickup = !def.metadata.noPickup;
@@ -259,7 +261,7 @@ module.exports = () => {
       const slot = def.metadata.slot || '';
       options.push({
         display: 'Slot',
-        displayValues: slot.length || none,
+        displayValues: slot || none,
         key: 'G',
         onSelect: (choice) => {
           menuMap.set('select-one', {
@@ -424,8 +426,6 @@ module.exports = () => {
         }
       });
 
-
-
       // TODO: The bundlemanger ends up naming the scripts as entity referencess,
       // Example, script of 'ranvier-blade' is named 'limbo:bladeofranvier' in the behaviorManager.
       // So will need to figure this out to be able to assign scripts, unless we free form text it.
@@ -481,7 +481,6 @@ module.exports = () => {
         key: 'q',
         bottomMenu: true,
         onSelect: () => {
-          // updateDef(def);
           eventStack.push(fileName);
           player.socket.emit('exit-olc', player, inputConfig);
         }
@@ -493,28 +492,4 @@ module.exports = () => {
     }
   };
 
-
-  // function updateDef(def) {
-  //   if (!def.override) {
-  //     let { itemLevel, level, speed, attackType, min, max, avg } = def.metadata;
-  //     if (typeof itemLevel !== 'undefined' && !isNaN(itemLevel)) {
-  //       def.metadata.itemLevel = level * 5;
-  //     }
-  //     if (typeof speed !== 'undefined' && !isNaN(speed)) {
-  //       const type = def.metadata.customFlags.includes('2_HANDED') ? '2_HANDED' : attackType;
-  //       def.metadata.speed = Math.trunc(convertSpeed(type).avg * 100) / 100;
-  //     }
-
-  //     if (typeof min !== 'undefined' && !isNaN(min)) {
-  //       def.metadata.min = Math.trunc(def.metadata.itemLevel / 2 + 1);
-  //     }
-  //     if (typeof max !== 'undefined' && !isNaN(max)) {
-  //       def.metadata.max = Math.trunc(def.metadata.itemLevel / 2 + def.metadata.itemLevel * .10);
-  //     }
-  //     if (typeof avg !== 'undefined' && !isNaN(avg)) {
-  //       def.metadata.avg = Math.trunc((def.metadata.min + def.metadata.max) / 2);
-  //     }
-  //   }
-
-  // }
 };
