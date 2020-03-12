@@ -111,6 +111,19 @@ module.exports = () => {
         },
       });
 
+      options.push({
+        display: 'Attributes',
+        displayValues: '',
+        key: 'A',
+        onSelect: () => {
+          inputConfig.menuMap.set('npc-attributes', {
+            // no-op
+          });
+          eventStack.push(fileName);
+          player.socket.emit('npc-attributes', player, inputConfig);
+        }
+      });
+
       // def.behaviors = def.behaviors || {};
       // const behaviorSelections = [...state.MobBehaviorManager.behaviors.keys()].filter(key => {
       //   return ( // only allow !required behaviors and non-class behaviors
