@@ -9,18 +9,18 @@ module.exports = () => {
 
   return {
     requiredRole: PlayerRoles.BUILDER,
-    usage: 'oedit <ER> || save <area>',
+    usage: 'medit <ER> || save <area>',
     command: (state) => (args, player, arg0) => {
 
       if (!args) {
         return B.sayAt(player, 'Usage:  ' + state.CommandManager.get(arg0).usage);
       }
-
+      
       let targetDef = null;
       let saving = false;
       let area;
       let created = false;
-      const type = 'Item';
+      const type = 'Npc';
 
       let [tarER, arg2] = args.split(' ');
       console.log(tarER, arg2);
@@ -38,7 +38,7 @@ module.exports = () => {
       }
 
       if (!area) {
-        const { target, area: resultArea, idNum } = SU.findER(state, player, 'item', tarER);
+        const { target, area: resultArea, idNum } = SU.findER(state, player, type, tarER);
         area = resultArea;
         targetDef = target;
 
@@ -47,11 +47,11 @@ module.exports = () => {
         }
 
         if (!targetDef && !saving) {
-          targetDef = EU.createItemDefinition(state, area, { id: idNum }, player);
+          targetDef = EU.createNpcDefinition(state, area, { id: idNum }, player);
           created = true;
 
           if (!targetDef) {
-            return B.sayAt(player, `Could not create the item '${tarER}'.`);
+            return B.sayAt(player, `Could not create the ${type} '${tarER}'.`);
           }
         }
       }
@@ -65,7 +65,7 @@ module.exports = () => {
         return DU.saveOLC(state, player, area, type);
       }
 
-      const er = state.ItemFactory.createEntityRef(area.name, targetDef.id);
+      const er = state.MobFactory.createEntityRef(area.name, targetDef.id);
       if (!saving) {
         const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area && pl.olc.er === er);
         if (alreadyEditing) {
@@ -74,8 +74,8 @@ module.exports = () => {
 
         function save() {
           DU.leaveOLC(state, player);
-          state.ItemFactory.setDefinition(er, targetDef);
-          area.changesMade ? area.changesMade.item = true : area.changesMade = { item: true };
+          state.MobFactory.setDefinition(er, targetDef);
+          area.changesMade ? area.changesMade.npc = true : area.changesMade = { npc: true };
         }
 
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
@@ -86,9 +86,9 @@ module.exports = () => {
             type,
             area,
             save,
-            editor: 'item-editor',
+            editor: 'npc-editor',
             created,
-            loggerName: targetDef.name || targetDef.title || `a new item`,
+            loggerName: targetDef.name || targetDef.title || `a new mob`,
           }
         );
       }
