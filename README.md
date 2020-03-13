@@ -28,7 +28,7 @@ Out of the box, Axon supports:
 - Area
 
 ## Axon Demo
-![demo olc gif](img/olc.gif "quick demo of the olc")
+![demo olc gif](img/olc-demo.gif "quick demo of the olc")
 
 
 ---
