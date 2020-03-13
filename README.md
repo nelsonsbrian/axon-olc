@@ -2,11 +2,11 @@
 
 ## Axon and what it can do...
 
-Axon allows you to customize specific editors (panels or views) to safely and reliably edit your world files within the game inside of a `Ranvier` build MUD. Some customization will be needed to match the properties and the data types of the values of your properties that you want to edit. Axon comes with several reusable editors that make the most common editing really easy to implment.
+Axon allows you to customize specific editors (panels or views) to safely and reliably edit your world files within the game inside of a `Ranvier` build MUD. Some customization will be needed to match the properties and the data types of the values of your properties that you want to edit. Axon comes with several reusable editors that make the most common editing really easy to implement.
 
 Some Reusable editors:
 * Input-text: Use for simple string sentences, setting values, or entityReferences
-* Togglable: Create a list of selections and toggle as many/few as you would like
+* Toggleable: Create a list of selections and toggle as many/few as you would like
 * Select-one: Select a single value from a list of created values to assign to a property
 
 ## About Ranvier
