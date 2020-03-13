@@ -16,7 +16,16 @@ Some Reusable editors:
 
 ## About Axon
 
-This is a work in progress and many of the details will be fleshed out in the future. Right now the goal is to support the default entity properties that `Ranvier` supports out of the box. It will be assumed that the developer will need to expand upon this module as it would be impossible to make a flexible module while making it specific enough for YOUR specific needs.
+Axon is designed to support the majority of the is to support the default entity properties that `Ranvier` supports out of the box. It will be assumed that the developer will need to expand upon this module as it would be impossible to make a flexible module while making it specific enough for YOUR specific needs.
+
+In addition to supplying the developer with some quick tools to change the default `Ranvier` project, the project was designed to easily allow expansion of the editors. Adding additional properties to definitions and reusing template editors allows you to quickly template out new menus and adapt it to your own Mud.
+
+Out of the box, Axon supports:
+- Npc
+- Item
+- Quest
+- Room
+- Area
 
 ## Axon Demo
 ![demo olc gif](img/olc.gif "quick demo of the olc")
@@ -57,31 +66,53 @@ function loop() {
 
 ---
 
-## Known Issues
-
-- Only the `Room` and `Item` entity has code written for it.
-- The bundle does not currently leverage the `entityLoader` feature of `Ranvier`.
-- Reach out on Slack with specific issues. @Spade
+## Known Issues & Notes
+- Some opinionated decisions were made in the following areas, but the promise of `Axon` is to enable the user to easily add to or change any of the default code:
+  1. Colorization and formatting of the menus.
+  2. Input validation - Most of the validation uses `@hapi/Joi`
+  3. Some commands are included, but aren't necessary for OLC functions (mlist, olist, etc). By default they aren't accessible to newly created players.
+  4. A lot of string formating uses `sprintf` library.
+- In effort to be modular, especially with the [quests-bundle](https://github.com/RanvierMUD/bundle-example-quests), a `QuestUtil` was made to help in provide the OLC components/options. If you were to want to expand on the quests-bundle, the recommendation would be to add `display` and `configOptions` static methods to all `QuestGoal` and `QuestReward`. The stock quests-bundle comes with `display` static methods in its `QuestReward` class, seen [here](https://github.com/RanvierMUD/bundle-example-quests/blob/da41e1bfc38d3941d0b4a11f1f9d3a82c6e75672/quest-rewards/CurrencyReward.js#L18) while the `QuestGoal` class does not.
+- The bundle does not currently leverage the [entityLoader](https://ranviermud.com/extending/entity_loaders/) feature of `Ranvier`.
+- Reach out on [Slack](https://ranviermud.slack.com/) with specific issues. @Spade
 
 ---
 
-## Common OLC Commands
+## OLC Commands
 
 ### General
 
-`olc` - Shows a list of areas that have changes made it it, but not saved to disk. Use `redit save`.
+- `olc` - Shows a list of areas that have changes made it it, but not saved to disk. Use `redit save`.
 
 ### Rooms
 
-`rlist [areaName]` - lists all the rooms in the specified area. No-arg defaults to current area of player.
-`redit [roomEntityReference]` - Opens the editor for the room. No-arg and . defaults to current room. `roomEntityReference` has partial lookup. For example, a room with entityReference of `magicForest:1` can be accessed by typing `redit mag:1` as long as there are no other area's with that name higher in the alphabetical order. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
-`redit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+- `rlist [areaName]` - lists all the rooms in the specified area. No-arg defaults to current area of player.
+- `redit [roomEntityReference]` - Opens the editor for the room. No-arg and . defaults to current room. - `roomEntityReference` has partial lookup. For example, a room with entityReference of `magicForest:1` can be accessed by typing `redit mag:1` as long as there are no other area's with that name higher in the alphabetical order. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
+- `redit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
 
 ### Items
 
-`olist [areaName]` - lists all the items in the specified area. No-arg defaults to current area of player.
-`oedit <itemEntityReference>` - Opens the editor for the specified item. If an an area is found, but not the id, a new item will be created for you to edit. The item will only be added to the `ItemFactory` if you choose to save the definition when exiting the editor. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
-`oedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+- `olist [areaName]` - lists all the items in the specified area. No-arg defaults to current area of player.
+- `oedit <itemEntityReference>` - Opens the editor for the specified item. If an an area is found, but not the id, a new item will be created for you to edit. The item will only be added to the `ItemFactory` if you choose to save the definition when exiting the editor. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
+- `oedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+
+### Npcs
+
+- `mlist [areaName]` - lists all the npcs in the specified area. No-arg defaults to current area of player.
+- `medit <npcEntityReference>` - Opens the editor for the specified npc. If an an area is found, but not the id, a new npc will be created for you to edit. The npc will only be added to the `MobFactory` if you choose to save the definition when exiting the editor. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
+- `medit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+
+### Area
+
+- `zlist` - lists all the areas in the game.
+- `zedit <areaId>` - Opens the editor for the specified area. Currently, you cannot create a new area using this OLC. Stock `Axon` does not come with any properties in `Area` to edit, but the menu is created for you to add in content. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
+- `zedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+
+### Quests
+- `qlist [areaName]` - lists all the quests in the specified area. No-arg defaults to current area of player.
+- `qedit <questEntityReference>` - Opens the editor for the specified quest. If an an area is found, but not the id, a new quest will be created for you to edit. The quest will only be added to the `QuestFactory` if you choose to save the definition when exiting the editor. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
+- `qedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
+*Note: The `QuestFactory` is not derived from the `EntityFactory` and thusly uses a different scheme than the other entities. For example, a quest 'definition' is actually `{ id: 300', areaName: 'Limbo', config: {...} }`.
 
 ---
 
