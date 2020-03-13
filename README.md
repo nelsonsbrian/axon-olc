@@ -1,18 +1,50 @@
-# Setup
 
-## Axon and what it can do...
+# Axon
+
+Table Of Contents
+=================
+
+* [About](#about)
+  - [About Ranvier](#about-ranvier)
+  - [About Axon](#about-axon)
+  - [Axon Demo](#axon-demo)
+  - [Install Axon-OLC](#install-axon-olc)
+    - [SubModule](#submodule)
+    - [Add Code](#add-code)
+  - [Known Issues & Notes](#known-issues---notes)
+  - [OLC Commands](#olc-commands)
+    - [General](#general)
+    - [Rooms](#rooms)
+    - [Items](#items)
+    - [Npcs](#npcs)
+    - [Area](#area)
+    - [Quests](#quests)
+  - [How It Works](#how-it-works)
+* [Editors](#editors)
+  - [Root-Editor](#root-editor)
+  - [Resuable](#resuable)
+    - [input-text](#input-text)
+    - [editor-text](#editor-text)
+    - [list-text](#list-text)
+    - [toggleable](#toggleable)
+    - [select-one](#select-one)
+
+# About
 
 Axon allows you to customize specific editors (panels or views) to safely and reliably edit your world files within the game inside of a `Ranvier` build MUD. Some customization will be needed to match the properties and the data types of the values of your properties that you want to edit. Axon comes with several reusable editors that make the most common editing really easy to implement.
 
 Some Reusable editors:
-* Input-text: Use for simple string sentences, setting values, or entityReferences
-* Toggleable: Create a list of selections and toggle as many/few as you would like
-* Select-one: Select a single value from a list of created values to assign to a property
+
+- Input-text: Use for simple string sentences, setting values, or entityReferences
+- Toggleable: Create a list of selections and toggle as many/few as you would like
+- Select-one: Select a single value from a list of created values to assign to a property
+
 
 ## About Ranvier
-* To Download Ranvier, see it's [github](https://github.com/RanvierMUD).
-* To see Ranvier's 'Getting Started' see [here](https://ranviermud.com/get_started/).
-* Questions about Axon or Ranvier, join us on slack: https://ranviermud.slack.com/
+
+- To Download Ranvier, see it's [github](https://github.com/RanvierMUD).
+- To see Ranvier's 'Getting Started' see [here](https://ranviermud.com/get_started/).
+- Questions about Axon or Ranvier, join us on slack: https://ranviermud.slack.com/
 
 ## About Axon
 
@@ -21,6 +53,7 @@ Axon is designed to support the majority of the is to support the default entity
 In addition to supplying the developer with some quick tools to change the default `Ranvier` project, the project was designed to easily allow expansion of the editors. Adding additional properties to definitions and reusing template editors allows you to quickly template out new menus and adapt it to your own Mud.
 
 Out of the box, Axon supports:
+
 - Npc
 - Item
 - Quest
@@ -28,8 +61,8 @@ Out of the box, Axon supports:
 - Area
 
 ## Axon Demo
-![demo olc gif](img/olc-demo.gif "quick demo of the olc")
 
+![demo olc gif](img/olc-demo.gif "quick demo of the olc")
 
 ---
 
@@ -39,7 +72,7 @@ Out of the box, Axon supports:
 
 From the `Ranvier` root directory:
 
-```
+```bash
 npm run install-bundle https://github.com/nelsonsbrian/axon-olc.git
 ```
 
@@ -64,9 +97,12 @@ function loop() {
 }
 ```
 
+You are now all set up to use `Axon-OLC`.
+
 ---
 
 ## Known Issues & Notes
+
 - Some opinionated decisions were made in the following areas, but the promise of `Axon` is to enable the user to easily add to or change any of the default code:
   1. Colorization and formatting of the menus.
   2. Input validation - Most of the validation uses `@hapi/Joi`
@@ -109,10 +145,11 @@ function loop() {
 - `zedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
 
 ### Quests
+
 - `qlist [areaName]` - lists all the quests in the specified area. No-arg defaults to current area of player.
 - `qedit <questEntityReference>` - Opens the editor for the specified quest. If an an area is found, but not the id, a new quest will be created for you to edit. The quest will only be added to the `QuestFactory` if you choose to save the definition when exiting the editor. Note: selecting `yes` to saving when exiting the editor will save the definition in memory, but not to the disk.
 - `qedit save <areaName | .` - Saves the edited definitions of the specific area to disk. `'.'` argument will select the area the player is currently in.
-*Note: The `QuestFactory` is not derived from the `EntityFactory` and thusly uses a different scheme than the other entities. For example, a quest 'definition' is actually `{ id: 300', areaName: 'Limbo', config: {...} }`.
+  \*Note: The `QuestFactory` is not derived from the `EntityFactory` and thusly uses a different scheme than the other entities. For example, a quest 'definition' is actually `{ id: 300', areaName: 'Limbo', config: {...} }`.
 
 ---
 
@@ -221,14 +258,15 @@ With this next photo, the option `Title` was selected with the `1` being inputed
 
 ## Root-Editor
 
-* `room-editor`
-* `item-editor`
-* `npc-editor`
-* `quest-editor`
+- `room-editor`
+- `item-editor`
+- `npc-editor`
+- `quest-editor`
 
 ## Resuable
 
 ### input-text
+
 Allows for the single input text. Can be used for text, number, or anything else you want to validate for. Can search for entityReferences as well.
 
 ```javascript
@@ -367,7 +405,9 @@ View:
 ![List-Text Pane](img/toggleable.png "Result of Code Above")
 
 ### select-one
+
 Allows for a single selection of preset values. The `selections` property expects and array of objects with at least a propery of `display` defined in each object. The other properties are up to the user to define and the entire object that is selected is passed to the `onExit()` function on the `selection` property.
+
 ```javascript
 const itemTypeSelections = Object.keys(ItemType).map(type => {
   return {
@@ -375,7 +415,7 @@ const itemTypeSelections = Object.keys(ItemType).map(type => {
     display: `${cap(type.toLowerCase().replace("_", " "))}`,
     // Add another property to be used as the 'selection' when returning from
     // the 'select-one' editor.
-    type,
+    type
   };
 });
 options.push({
@@ -396,7 +436,7 @@ options.push({
     player.socket.emit("select-one", player, inputConfig);
   },
   onExit: optionConfig => {
-    def.type = optionConfig.selection.type; 
+    def.type = optionConfig.selection.type;
     // optionConfig.selection.type corresponds to the `type` chosen from the `itemTypeSelections`.
   }
 });
