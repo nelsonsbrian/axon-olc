@@ -406,7 +406,7 @@ View:
 
 ### select-one
 
-Allows for a single selection of preset values. The `selections` property expects and array of objects with at least a propery of `display` defined in each object. The other properties are up to the user to define and the entire object that is selected is passed to the `onExit()` function on the `selection` property.
+Allows for a single selection of preset values. The `selections` property expects an array of objects with at least a property of `display` defined in each object. The other properties are up to the user to define and the entire object that is selected is passed to the `onExit()` function on the `selection` property.
 
 ```javascript
 const itemTypeSelections = Object.keys(ItemType).map(type => {
