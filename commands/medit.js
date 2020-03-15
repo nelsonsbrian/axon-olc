@@ -44,6 +44,10 @@ module.exports = () => {
           return B.sayAt(player, `Can't find the area: '${tarER}'.`);
         }
 
+        if (idNum === '') {
+          return B.sayAt(player, `Must supply an id value to create a resource.`);
+        }
+        
         if (!targetDef && !saving) {
           targetDef = EU.createNpcDefinition(state, area, { id: idNum }, player);
           created = true;
