@@ -8,6 +8,7 @@ const DU = require('../lib/DisplayUtil');
 const { capitalize: cap, objClass } = require('../lib/StringUtil');
 const { toDirections } = require('../lib/Constants');
 const { booleanColors } = require('../lib/ColorUtil');
+const { quit } = require('../lib/OlcOptions');
 
 module.exports = () => {
   return {
@@ -25,16 +26,15 @@ module.exports = () => {
       inputConfig.fileName = fileName;
 
       let { er, eventStack, menuMap, def, none } = inputConfig;
-      const config = def.config;
       let options = [];
 
       options.push({
         display: 'Title',
-        displayValues: `<yellow>${config.title}</yellow>`,
+        displayValues: `<yellow>${def.title}</yellow>`,
         key: '1',
         onSelect: (choice) => {
           menuMap.set('input-text', {
-            text: config.title,
+            text: def.title,
             schema: Joi.string().min(1).max(75).required(),
             displayProperty: 'Quest Title',
             onExit: choice.onExit,
@@ -43,17 +43,17 @@ module.exports = () => {
           player.socket.emit('input-text', player, inputConfig);
         },
         onExit: (optionConfig) => {
-          config.title = optionConfig.text;
+          def.title = optionConfig.text;
         }
       });
 
       options.push({
         display: 'Description',
-        displayValues: `\r\n` + DU.editorTextDisplayValue(config.description),
+        displayValues: `\r\n` + DU.editorTextDisplayValue(def.description),
         key: '2',
         onSelect: (choice) => {
           menuMap.set('editor-text', {
-            text: config.description,
+            text: def.description,
             params: {
               min: 0,
               max: 2100
@@ -66,18 +66,18 @@ module.exports = () => {
         },
         onExit: (optionConfig, cmd) => {
           if (cmd === '@s') {
-            config.description = optionConfig.text;
+            def.description = optionConfig.text;
           }
         }
       });
 
       options.push({
         display: 'Completion Message',
-        displayValues: `\r\n` + DU.editorTextDisplayValue(config.completionMessage),
+        displayValues: `\r\n` + DU.editorTextDisplayValue(def.completionMessage),
         key: '3',
         onSelect: (choice) => {
           menuMap.set('editor-text', {
-            text: config.completionMessage,
+            text: def.completionMessage,
             params: {
               min: 0,
               max: 2100
@@ -90,18 +90,18 @@ module.exports = () => {
         },
         onExit: (optionConfig, cmd) => {
           if (cmd === '@s') {
-            config.completionMessage = optionConfig.text;
+            def.completionMessage = optionConfig.text;
           }
         }
       });
 
       options.push({
         display: 'Level',
-        displayValues: config.level,
+        displayValues: def.level,
         key: '8',
         onSelect: (choice) => {
           menuMap.set('input-text', {
-            text: config.level,
+            text: def.level,
             schema: Joi.number().integer().min(1).max(100).required(),
             displayProperty: choice.display,
             onExit: choice.onExit,
@@ -111,7 +111,7 @@ module.exports = () => {
         },
         onExit: (optionConfig) => {
           const inputLevel = parseInt(optionConfig.text);
-          config.level = inputLevel;
+          def.level = inputLevel;
         },
       });
 
@@ -124,20 +124,20 @@ module.exports = () => {
         display: 'Repeatable'
       },
       ].forEach(({ prop, display }, i) => {
-        config[prop] = typeof config[prop] === 'undefined' ? false : config[prop];
-        const { open: o, close: c } = booleanColors(config[prop]) || { open: '', close: '' };
+        def[prop] = typeof def[prop] === 'undefined' ? false : def[prop];
+        const { open: o, close: c } = booleanColors(def[prop]) || { open: '', close: '' };
         options.push({
           display,
-          displayValues: `${o}${cap(config[prop].toString())}${c}`,
+          displayValues: `${o}${cap(def[prop].toString())}${c}`,
           key: String.fromCharCode(65 + i), // 65=A
           onSelect: () => {
-            config[prop] = !config[prop];
+            def[prop] = !def[prop];
             socket.emit(fileName, player, inputConfig);
           },
         });
       })
 
-      const requires = config.requires || [];
+      const requires = def.requires || [];
       options.push({
         display: 'Previous Quests',
         displayValues: requires.length ? requires.join(' ') : none,
@@ -161,11 +161,11 @@ module.exports = () => {
           player.socket.emit('list-text', player, inputConfig);
         },
         onExit: (optionConfig) => {
-          config.requires = [...optionConfig.current];
+          def.requires = [...optionConfig.current];
         }
       });
 
-      const rewards = config.rewards || [];
+      const rewards = def.rewards || [];
       options.push({
         display: `Rewards`,
         displayValues: rewards.length || none,
@@ -179,7 +179,7 @@ module.exports = () => {
         }
       });
 
-      const goals = config.goals || [];
+      const goals = def.goals || [];
       options.push({
         display: `Goals`,
         displayValues: goals.length || none,
@@ -193,16 +193,8 @@ module.exports = () => {
         }
       });
 
-      options.push({
-        display: 'Quit',
-        displayValues: '',
-        key: 'q',
-        bottomMenu: true,
-        onSelect: () => {
-          eventStack.push(fileName);
-          player.socket.emit('exit-olc', player, inputConfig);
-        }
-      });
+      // Quit Option
+      options.push(quit(player, inputConfig));
 
       // Show the Menu
       DU.showMenu(player, inputConfig, options);

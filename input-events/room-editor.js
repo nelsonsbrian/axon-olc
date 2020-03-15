@@ -7,6 +7,7 @@ const { Broadcast: B, EventUtil, } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
 const { capitalize: cap, objClass } = require('../lib/StringUtil');
 const { toDirections } = require('../lib/Constants');
+const { quit } = require('../lib/OlcOptions');
 
 module.exports = () => {
   return {
@@ -144,16 +145,8 @@ module.exports = () => {
         }
       });
 
-      options.push({
-        display: 'Quit',
-        displayValues: '',
-        key: 'q',
-        bottomMenu: true,
-        onSelect: () => {
-          eventStack.push(fileName);
-          player.socket.emit('exit-olc', player, inputConfig);
-        }
-      });
+      // Quit Option
+      options.push(quit(player, inputConfig));
 
       // Show the Menu
       DU.showMenu(player, inputConfig, options);

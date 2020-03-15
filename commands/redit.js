@@ -77,14 +77,13 @@ module.exports = () => {
 
         function save() {
           if (created) {
-            const newRoom = new Room(area, createdConfig);
+            const newRoom = new Room(area, targetDef);
             area.addRoom(newRoom);
             state.RoomManager.addRoom(newRoom);
             newRoom.hydrate(state);
           } else {
             EU.reloadFromRoomDefinition(state.RoomManager.getRoom(er), targetDef);
           }
-          DU.leaveOLC(state, player);
           area.changesMade ? area.changesMade.room = true : area.changesMade = { room: true };
         }
 

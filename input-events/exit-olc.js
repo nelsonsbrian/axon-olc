@@ -3,7 +3,7 @@
 const sprintf = require('sprintf-js').sprintf;
 const path = require('path');
 const Joi = require('@hapi/joi');
-const { Broadcast: B, EventUtil, Logger} = require('ranvier');
+const { Broadcast: B, EventUtil, Logger } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
 const { capitalize: cap, objClass } = require('../lib/StringUtil');
 
@@ -35,10 +35,11 @@ module.exports = () => {
 
       socket.once('data', data => {
         data = data.toString().trim().toLowerCase();
-        console.log(fileName, data);
+        Logger.log('OLC Saved:', fileName, data);
 
         if (data === 'y' || data === 'ye' || data === 'yes') {
           say(`<b><green>Changes saved to memory.</green></b>`);
+          DU.leaveOLC(state, player);
           save && save(inputConfig);
           return socket.emit('commands', player);
 

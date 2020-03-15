@@ -73,7 +73,6 @@ module.exports = () => {
         }
 
         function save() {
-          DU.leaveOLC(state, player);
           state.ItemFactory.setDefinition(er, targetDef);
           area.changesMade ? area.changesMade.item = true : area.changesMade = { item: true };
         }

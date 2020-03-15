@@ -37,7 +37,7 @@ module.exports = () => {
         }
 
         if (!area) {
-          const { target, area: resultArea, idNum } = SU.findER(state, player, 'area', tarER);
+          const { target, area: resultArea, idNum } = SU.findER(state, player, type, tarER);
           area = resultArea;
 
           if (!area) {
@@ -63,7 +63,7 @@ module.exports = () => {
         }
 
         function save() {
-          DU.leaveOLC(state, player);
+          // Add Logic here to expand on area saving.
           area.changesMade ? area.changesMade.area = true : area.changesMade = { area: true };
         }
 

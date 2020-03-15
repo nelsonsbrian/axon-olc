@@ -37,7 +37,7 @@ module.exports = () => {
       }
 
       if (!area) {
-        const { target, area: resultArea, idNum } = SU.findER(state, player, 'quest', tarER);
+        const { target, area: resultArea, idNum } = SU.findER(state, player, type, tarER);
         area = resultArea;
         targetDef = target;
         id = idNum;
@@ -56,6 +56,10 @@ module.exports = () => {
         }
       }
 
+      if (!targetDef && !saving) {
+        return B.sayAt(player, `Could not find the quest '${tarER}'.`);
+      }
+      
       // Alreadying Editing
       if (saving) {
         const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area);
@@ -73,7 +77,6 @@ module.exports = () => {
         }
 
         function save() {
-          DU.leaveOLC(state, player);
           state.QuestFactory.add(targetDef.area, targetDef.id, targetDef.config);
           area.changesMade ? area.changesMade.quest = true : area.changesMade = { quest: true };
         }
@@ -81,7 +84,7 @@ module.exports = () => {
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
         DU.enterOLC(state, player,
           {
-            def: targetDef,
+            def: targetDef.config,
             er,
             type,
             area,

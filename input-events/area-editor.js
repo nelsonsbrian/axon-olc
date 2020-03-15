@@ -5,6 +5,7 @@ const path = require('path');
 const Joi = require('@hapi/joi');
 const { Broadcast: B, EventUtil } = require('ranvier');
 const DU = require('../lib/DisplayUtil');
+const { quit } = require('../lib/OlcOptions');
 const { capitalize: cap } = require('../lib/StringUtil');
 
 module.exports = () => {
@@ -50,16 +51,8 @@ module.exports = () => {
       //   }
       // });
 
-      options.push({
-        display: 'Quit',
-        displayValues: '',
-        key: 'q',
-        bottomMenu: true,
-        onSelect: () => {
-          eventStack.push(fileName);
-          player.socket.emit('exit-olc', player, inputConfig);
-        }
-      });
+      // Quit Option
+      options.push(quit(player, inputConfig));
 
       // Show the Menu
       DU.showMenu(player, inputConfig, options);

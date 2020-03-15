@@ -28,13 +28,11 @@ module.exports = () => {
         saving = true;
         tarER = arg2;
         if (!tarER) {
-          return B.sayAt(player, `Which area would you like to save?`);
+          return B.sayAt(player, `Which mob would you like to save?`);
         }
-      }
-
-      if (tarER === '.') {
-        area = player.room.area;
-        targetDef = player.room;
+        if (tarER === '.') {
+          area = player.room.area;
+        }
       }
 
       if (!area) {
@@ -56,6 +54,10 @@ module.exports = () => {
         }
       }
 
+      if (!targetDef && !saving) {
+        return B.sayAt(player, `Could not find the mob '${tarER}'.`);
+      }
+
       // Alreadying Editing
       if (saving) {
         const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area);
@@ -73,7 +75,6 @@ module.exports = () => {
         }
 
         function save() {
-          DU.leaveOLC(state, player);
           state.MobFactory.setDefinition(er, targetDef);
           area.changesMade ? area.changesMade.npc = true : area.changesMade = { npc: true };
         }
