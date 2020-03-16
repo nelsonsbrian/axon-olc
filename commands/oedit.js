@@ -48,7 +48,7 @@ module.exports = () => {
 
         if (idNum === '') {
           return B.sayAt(player, `Must supply an id value to create a resource.`);
-        }        
+        }
 
         if (!targetDef && !saving) {
           targetDef = EU.createItemDefinition(state, area, { id: idNum }, player);
@@ -82,7 +82,7 @@ module.exports = () => {
         }
 
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
-        DU.enterOLC(state, player,
+        DU.enterOLC(player,
           {
             def: targetDef,
             er,

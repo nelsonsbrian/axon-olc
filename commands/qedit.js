@@ -63,7 +63,7 @@ module.exports = () => {
       if (!targetDef && !saving) {
         return B.sayAt(player, `Could not find the quest '${tarER}'.`);
       }
-      
+
       // Alreadying Editing
       if (saving) {
         const alreadyEditing = [...state.PlayerManager.players.values()].some(pl => pl.olc && pl.olc.area === area);
@@ -86,7 +86,7 @@ module.exports = () => {
         }
 
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
-        DU.enterOLC(state, player,
+        DU.enterOLC(player,
           {
             def: targetDef.config,
             er,

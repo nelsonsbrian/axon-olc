@@ -15,7 +15,7 @@ module.exports = () => {
       if (!args) {
         return B.sayAt(player, 'Usage:  ' + state.CommandManager.get(arg0).usage);
       }
-      
+
       let targetDef = null;
       let saving = false;
       let area;
@@ -47,7 +47,7 @@ module.exports = () => {
         if (idNum === '') {
           return B.sayAt(player, `Must supply an id value to create a resource.`);
         }
-        
+
         if (!targetDef && !saving) {
           targetDef = EU.createNpcDefinition(state, area, { id: idNum }, player);
           created = true;
@@ -84,7 +84,7 @@ module.exports = () => {
         }
 
         targetDef = JSON.parse(JSON.stringify(targetDef)); // Make sure it's clean object.
-        DU.enterOLC(state, player,
+        DU.enterOLC(player,
           {
             def: targetDef,
             er,

@@ -72,7 +72,7 @@ module.exports = () => {
           metadata: area.metadata,
           script: area.script
         };
-        DU.enterOLC(state, player,
+        DU.enterOLC(player,
           {
             def: targetDef,
             er,
