@@ -77,13 +77,14 @@ module.exports = () => {
         if (value !== true && value !== false) {
           continue;
         }
-        const { open: o, close: c } = door && booleanColors(door[prop]) || { open: '', close: '' };
+        const evalProp = door && door[prop] ? door[prop] : value;
+        const { open: o, close: c } = door && booleanColors(evalProp) || { open: '', close: '' };
         options.push({
           display: cap(prop),
-          displayValues: door ? `${o}${cap(door[prop].toString())}${c}` : '',
+          displayValues: door ? `${o}${cap(evalProp.toString())}${c}` : '',
           key: i.toString(),
           onSelect: () => {
-            door[prop] = !door[prop];
+            door[prop] = !evalProp;
             return socket.emit(fileName, player, inputConfig);
           },
           hide: () => {
