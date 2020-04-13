@@ -184,7 +184,7 @@ module.exports = () => {
           const updatedSlots = {};
           [...equipmentMap.entries()].forEach(([slot, itemEr]) => {
             if (itemEr) {
-              updatedSlots[slot] = { entityReference: itemEr };
+              updatedSlots[slot] = itemEr;
             }
           });
           def.equipment = updatedSlots;
