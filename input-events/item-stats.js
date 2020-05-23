@@ -53,6 +53,7 @@ module.exports = () => {
             const inputStatValue = parseInt(optionConfig.text);
             if (inputStatValue === -1) {
               delete def.metadata.stats[attr];
+              return;
             }
             def.metadata.stats[attr] = inputStatValue;
           }
