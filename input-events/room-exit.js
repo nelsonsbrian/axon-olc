@@ -19,14 +19,14 @@ module.exports = () => {
 
       inputConfig.fileName = fileName;
 
-      let { entity, eventStack, menuMap, def, none } = inputConfig;
+      let { er, eventStack, menuMap, def, none } = inputConfig;
 
       const { direction } = menuMap.get(fileName);
 
       const exit = def.exits.find(ex => ex.direction === direction);
       const door = exit && def.doors && def.doors[exit.roomId];
       const exitRoom = exit && exit.roomId && state.RoomManager.getRoom(exit.roomId);
-      // const exitRoomDoor = exitRoom && exitRoom.def.doors[entity.entityReference];
+      // const exitRoomDoor = exitRoom && exitRoom.def.doors[er];
       const { roomId, leaveMessage = '' } = exit || {};
 
       let options = [];
